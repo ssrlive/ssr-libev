@@ -84,7 +84,7 @@ int http_simple_client_encode(obfs *self, char **pencryptdata, int datalength, s
     char * phost[128];
     int host_num = 0;
     int pos;
-    char hostport[128];
+    char hostport[128*10];
     int head_size = self->server.head_len + (int)(xorshift128plus() & 0x3F);
     int outlength;
     char * out_buffer = (char*)malloc((size_t)(datalength + 2048));
@@ -226,7 +226,7 @@ int http_post_client_encode(obfs *self, char **pencryptdata, int datalength, siz
     char * phost[128];
     int host_num = 0;
     int pos;
-    char hostport[128];
+    char hostport[128*10];
     int head_size = self->server.head_len + (int)(xorshift128plus() & 0x3F);
     int outlength;
     char * out_buffer = (char*)malloc((size_t)(datalength + 4096));

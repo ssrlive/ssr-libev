@@ -3,6 +3,26 @@ set(SOURCE_FILES_SNI
         tls.c
         rule.c)
 
+set(SOURCE_FILES_OBFS
+        obfs/verify.c
+        obfs/verify.h
+        obfs/tls1.2_ticket.c
+        obfs/tls1.2_ticket.h
+        obfs/obfsutil.c
+        obfs/obfsutil.h
+        obfs/obfs.c
+        obfs/obfs.h
+        obfs/http_simple.c
+        obfs/http_simple.h
+        obfs/crc32.c
+        obfs/crc32.h
+        obfs/base64.c
+        obfs/base64.h
+        obfs/auth_chain.c
+        obfs/auth_chain.h
+        obfs/auth.c
+        obfs/auth.h)
+
 set(SOURCE_FILES_LOCAL
         utils.c
         jconf.c
@@ -13,6 +33,7 @@ set(SOURCE_FILES_LOCAL
         acl.c
         netutils.c
         local.c
+        ${SOURCE_FILES_OBFS}
         ${SOURCE_FILES_SNI})
 
 set(SOURCE_FILES_TUNNEL
@@ -36,6 +57,7 @@ set(SOURCE_FILES_SERVER
         resolv.c
         netutils.c
         server.c
+        ${SOURCE_FILES_OBFS}
         ${SOURCE_FILES_SNI})
 
 set(SOURCE_FILES_MANAGER
@@ -53,6 +75,7 @@ set(SOURCE_FILES_REDIR
         cache.c
         udprelay.c
         redir.c
+        ${SOURCE_FILES_OBFS}
         ${SOURCE_FILES_SNI})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

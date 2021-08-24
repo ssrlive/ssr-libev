@@ -16,7 +16,7 @@ project(${PROJECT_NAME})
 set(VERSION 2.5.6)
 
 
-set(with_crypto_library "openssl" CACHE STRING "build with the given crypto library, TYPE=openssl|polarssl|mbedtls default=openssl")
+set(with_crypto_library "mbedtls" CACHE STRING "build with the given crypto library, TYPE=openssl|polarssl|mbedtls default=mbedtls")
 
 
 

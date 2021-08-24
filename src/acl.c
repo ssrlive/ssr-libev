@@ -103,7 +103,7 @@ static int
 run_cmd(const char *cmd)
 {
     int ret = 0;
-    char cmdstring[256];
+    char cmdstring[2560];
 
     sprintf(cmdstring, "%s\n", cmd);
     size_t len = strlen(cmdstring);
@@ -120,7 +120,7 @@ static int
 init_firewall()
 {
     int ret = 0;
-    char cli[256];
+    char cli[2560];
     FILE *fp;
 
     if (getuid() != 0)
@@ -170,7 +170,7 @@ static int
 reset_firewall()
 {
     int ret = 0;
-    char cli[256];
+    char cli[2560];
 
     if (getuid() != 0)
         return -1;
