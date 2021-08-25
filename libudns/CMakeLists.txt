@@ -7,6 +7,10 @@
 project ( libudns )
 cmake_minimum_required ( VERSION 2.8 )
 
+if(ANDROID)
+    add_definitions(-DHAVE_DECL_INET_NTOP)
+endif()
+
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 set ( UDNS_SRC

@@ -93,6 +93,20 @@ if (WIN32)
     list ( APPEND SOURCE_FILES_SERVER win32.c )
 endif ()
 
+if (ANDROID)
+    add_definitions(-DHAVE_CONFIG_H -DUSE_CRYPTO_MBEDTLS -DCONNECT_IN_PROGRESS=EINPROGRESS -DHAVE_PCRE_H)
+    include_directories(${LIB_ANCILLARY_DIR})
+    list ( APPEND SOURCE_FILES_LOCAL android.c )
+    add_executable(ss-local ${SOURCE_FILES_LOCAL})
+    set_target_properties(ss-local PROPERTIES COMPILE_DEFINITIONS MODULE_LOCAL)
+    set_target_properties(ss-local PROPERTIES PREFIX "lib" SUFFIX ".so")
+    target_link_libraries(ss-local
+            m log
+            ev libcork libipset udns sodium
+            ancillary ${LIBCRYPTO} ${PCRE_LIBRARIES}
+            )
+else()
+
 add_executable(ss_local ${SOURCE_FILES_LOCAL})
 #add_executable(ss_tunnel ${SOURCE_FILES_TUNNEL})
 #add_executable(ss_server ${SOURCE_FILES_SERVER})
@@ -153,3 +167,5 @@ target_link_libraries(ss_local
 target_link_libraries(ss_redir
         ${ss_lib_net}
         )
+
+endif()
