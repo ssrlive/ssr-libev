@@ -1507,6 +1507,13 @@ main(int argc, char **argv)
             {           0,                 0, 0, 0 }
     };
 
+#if defined(WAIT_DEBUGGER_ATTACH)
+    int volatile flag = 0;
+    while (flag == 0 ) {
+        sleep(1);
+    }
+#endif
+
     opterr = 0;
 
     USE_TTY();

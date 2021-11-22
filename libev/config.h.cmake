@@ -123,3 +123,6 @@
 
 /* Version number of package */
 #cmakedefine VERSION "@DIST_VERSION@"
+
+#define DNDEBUG 1
+#define HAVE_CONFIG_H 1
