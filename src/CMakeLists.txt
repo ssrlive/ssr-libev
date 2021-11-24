@@ -97,24 +97,24 @@ if (ANDROID)
     add_definitions(-DHAVE_CONFIG_H -DUSE_CRYPTO_MBEDTLS -DCONNECT_IN_PROGRESS=EINPROGRESS -DHAVE_PCRE_H)
     include_directories(${LIB_ANCILLARY_DIR})
     list ( APPEND SOURCE_FILES_LOCAL android.c )
-    add_executable(ss-local ${SOURCE_FILES_LOCAL})
-    set_target_properties(ss-local PROPERTIES COMPILE_DEFINITIONS MODULE_LOCAL)
-    set_target_properties(ss-local PROPERTIES PREFIX "lib" SUFFIX ".so")
-    target_link_libraries(ss-local
+    add_executable(ssr-client ${SOURCE_FILES_LOCAL})
+    set_target_properties(ssr-client PROPERTIES COMPILE_DEFINITIONS MODULE_LOCAL)
+    set_target_properties(ssr-client PROPERTIES PREFIX "lib" SUFFIX ".so")
+    target_link_libraries(ssr-client
             m log
             ev libcork libipset udns sodium
             ancillary ${LIBCRYPTO} ${PCRE_LIBRARIES}
             )
 else()
 
-add_executable(ss_local ${SOURCE_FILES_LOCAL})
+add_executable(ssr-client ${SOURCE_FILES_LOCAL})
 #add_executable(ss_tunnel ${SOURCE_FILES_TUNNEL})
 #add_executable(ss_server ${SOURCE_FILES_SERVER})
 #add_executable(ss_manager ${SOURCE_FILES_MANAGER})
 add_executable(ss_redir ${SOURCE_FILES_REDIR})
 add_library(libshadowsocks-libev ${SOURCE_FILES_LOCAL})
 
-set_target_properties(ss_local PROPERTIES
+set_target_properties(ssr-client PROPERTIES
         COMPILE_DEFINITIONS MODULE_LOCAL
         )
 #set_target_properties(ss_tunnel PROPERTIES
@@ -152,7 +152,7 @@ if (WIN32)
     list ( APPEND ss_lib_net Ws2_32 )
 endif()
 
-target_link_libraries(ss_local
+target_link_libraries(ssr-client
         ${ss_lib_net}
 )
 #target_link_libraries(ss_tunnel
