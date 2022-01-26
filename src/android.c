@@ -35,6 +35,11 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
+#if ANDROID
+
+#include <jni.h>
+#include <assert.h>
+
 #include <sys/un.h>
 #include <ancillary.h>
 
@@ -44,6 +49,7 @@
 
 #include "netutils.h"
 #include "utils.h"
+#include "local.h"
 
 int
 protect_socket(int fd)
@@ -110,8 +116,8 @@ send_traffic_stat(uint64_t tx, uint64_t rx)
     struct timeval tv;
     tv.tv_sec  = 1;
     tv.tv_usec = 0;
-    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
-    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(struct timeval));
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
+    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));
 
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;
@@ -143,3 +149,65 @@ send_traffic_stat(uint64_t tx, uint64_t rx)
     close(sock);
     return ret;
 }
+
+JNIEXPORT jint JNICALL
+Java_com_github_shadowsocks_bg_SsrClientWrapper_runSsrClient(JNIEnv *env, jclass clazz,
+                                                               jobject cmd) {
+    int result = -1;
+    jclass alCls = NULL;
+    do {
+        alCls = (*env)->FindClass(env, "java/util/ArrayList");
+        if (alCls == NULL) {
+            break;
+        }
+        jmethodID alGetId = (*env)->GetMethodID(env, alCls, "get", "(I)Ljava/lang/Object;");
+        jmethodID alSizeId = (*env)->GetMethodID(env, alCls, "size", "()I");
+        if (alGetId == NULL || alSizeId == NULL) {
+            break;
+        }
+
+        int arrayCount = (int) ((*env)->CallIntMethod(env, cmd, alSizeId));
+        if (arrayCount <= 0) {
+            break;
+        }
+
+        char ** argv = NULL;
+        argv = (char **) calloc(arrayCount, sizeof(char*));
+        if (argv == NULL) {
+            break;
+        }
+
+        for (int index = 0; index < arrayCount; ++index) {
+            jobject obj = (*env)->CallObjectMethod(env, cmd, alGetId, index);
+            assert(obj);
+            const char *cid = (*env)->GetStringUTFChars(env, obj, NULL);
+            assert(cid);
+
+            argv[index] = strdup(cid);
+            assert(argv[index]);
+            (*env)->DeleteLocalRef(env, obj);
+        }
+
+        result = main(arrayCount, argv);
+
+        for (int index = 0; index < arrayCount; ++index) {
+            free(argv[index]);
+            argv[index] = NULL;
+        }
+        free(argv);
+        argv = NULL;
+    } while (false);
+
+    if (alCls) {
+        (*env)->DeleteLocalRef(env, alCls);
+    }
+    return result;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_github_shadowsocks_bg_SsrClientWrapper_stopSsrClient(JNIEnv *env, jclass clazz) {
+    exit_main_event_loop();
+    return 0;
+}
+
+#endif // ANDROID

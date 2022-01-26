@@ -99,4 +99,7 @@ typedef struct server {
     obfs *obfs;
 } server_t;
 
+void exit_main_event_loop(void);
+int main(int argc, char **argv);
+
 #endif // _LOCAL_H

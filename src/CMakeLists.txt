@@ -24,6 +24,9 @@ set(SOURCE_FILES_OBFS
         obfs/auth.h)
 
 set(SOURCE_FILES_LOCAL
+        android.c
+        getopt.c
+        getopt.h
         utils.c
         jconf.c
         json.c
@@ -96,7 +99,6 @@ endif ()
 if (ANDROID)
     add_definitions(-DHAVE_CONFIG_H -DUSE_CRYPTO_MBEDTLS -DCONNECT_IN_PROGRESS=EINPROGRESS -DHAVE_PCRE_H)
     include_directories(${LIB_ANCILLARY_DIR})
-    list ( APPEND SOURCE_FILES_LOCAL android.c )
     add_executable(ssr-client ${SOURCE_FILES_LOCAL})
     set_target_properties(ssr-client PROPERTIES COMPILE_DEFINITIONS MODULE_LOCAL)
     set_target_properties(ssr-client PROPERTIES PREFIX "lib" SUFFIX ".so")
@@ -112,7 +114,7 @@ add_executable(ssr-client ${SOURCE_FILES_LOCAL})
 #add_executable(ss_server ${SOURCE_FILES_SERVER})
 #add_executable(ss_manager ${SOURCE_FILES_MANAGER})
 add_executable(ss_redir ${SOURCE_FILES_REDIR})
-add_library(libshadowsocks-libev ${SOURCE_FILES_LOCAL})
+#add_library(libshadowsocks-libev ${SOURCE_FILES_LOCAL})
 
 set_target_properties(ssr-client PROPERTIES
         COMPILE_DEFINITIONS MODULE_LOCAL
@@ -129,10 +131,8 @@ set_target_properties(ssr-client PROPERTIES
 set_target_properties(ss_redir PROPERTIES
         COMPILE_DEFINITIONS MODULE_REDIR
         )
-target_compile_definitions(libshadowsocks-libev
-        PRIVATE MODULE_LOCAL LIB_ONLY
-        )
-set_target_properties(libshadowsocks-libev PROPERTIES SUFFIX ".la")
+#target_compile_definitions(libshadowsocks-libev PRIVATE MODULE_LOCAL LIB_ONLY)
+#set_target_properties(libshadowsocks-libev PROPERTIES SUFFIX ".la")
 
 set (ss_lib_common
         ev

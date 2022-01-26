@@ -140,6 +140,32 @@ static struct cork_dllist inactive_profiles;
 static listen_ctx_t *current_profile;
 static struct cork_dllist all_connections;
 
+bool run_loop_exit_flag = false;
+ev_timer exit_watch_timer = { 0 };
+int exit_watch_interval = 0.2;
+int g_listenfd = 0;
+
+static void _do_exit_loop_internal(EV_P) {
+    if (g_listenfd > 0) {
+        close(g_listenfd);
+        g_listenfd = 0;
+    }
+    LOGI("%s", "exiting...");
+    ev_unloop(EV_A_ EVUNLOOP_ALL);
+}
+
+static void exit_flag_timer_cb(EV_P_ ev_timer *timer, int revents) {
+    if (run_loop_exit_flag) {
+        run_loop_exit_flag = false;
+        ev_timer_stop(EV_A_ timer);
+        _do_exit_loop_internal(EV_A);
+    }
+}
+
+void exit_main_event_loop(void) {
+    run_loop_exit_flag = true;
+}
+
 #ifndef __MINGW32__
 int
 setnonblocking(int fd)
@@ -1415,7 +1441,7 @@ signal_cb(EV_P_ ev_signal *w, int revents)
 #ifndef __MINGW32__
         case SIGUSR1:
 #endif
-            ev_unloop(EV_A_ EVUNLOOP_ALL);
+            _do_exit_loop_internal(EV_A);
         }
     }
 }
@@ -1900,15 +1926,15 @@ main(int argc, char **argv)
     cork_dllist_init(&inactive_profiles);
     current_profile = profile;
 
+    struct ev_loop *loop = EV_DEFAULT;
+
     // Setup signal handler
     struct ev_signal sigint_watcher;
     struct ev_signal sigterm_watcher;
     ev_signal_init(&sigint_watcher, signal_cb, SIGINT);
     ev_signal_init(&sigterm_watcher, signal_cb, SIGTERM);
-    ev_signal_start(EV_DEFAULT, &sigint_watcher);
-    ev_signal_start(EV_DEFAULT, &sigterm_watcher);
-
-    struct ev_loop *loop = EV_DEFAULT;
+    ev_signal_start(EV_A_ &sigint_watcher);
+    ev_signal_start(EV_A_ &sigterm_watcher);
 
     listen_ctx_t *listen_ctx = current_profile;
 
@@ -1932,6 +1958,11 @@ main(int argc, char **argv)
 
         ev_io_init(&listen_ctx->io, accept_cb, listenfd, EV_READ);
         ev_io_start(loop, &listen_ctx->io);
+
+        g_listenfd = listenfd;
+        ev_timer_init(&exit_watch_timer, exit_flag_timer_cb,
+                      exit_watch_interval, exit_watch_interval);
+        ev_timer_start(EV_A_ &exit_watch_timer);
     }
 
     // Setup UDP
@@ -1988,8 +2019,8 @@ main(int argc, char **argv)
     winsock_cleanup();
 #endif
 
-    ev_signal_stop(EV_DEFAULT, &sigint_watcher);
-    ev_signal_stop(EV_DEFAULT, &sigterm_watcher);
+    ev_signal_stop(EV_A_ &sigint_watcher);
+    ev_signal_stop(EV_A_ &sigterm_watcher);
 
     return 0;
 }
