@@ -51,6 +51,7 @@
 #include "utils.h"
 #include "local.h"
 
+#if 0
 int
 protect_socket(int fd)
 {
@@ -97,6 +98,34 @@ protect_socket(int fd)
     close(sock);
     return ret;
 }
+#else
+
+#include <dlfcn.h>
+#include <fake_dlfcn.h>
+#include <assert.h>
+
+int protect_socket(int fd) {
+#define LIB_NETD_CLIENT_SO "libnetd_client.so"
+    typedef int (*PFN_protectFromVpn)(int socketFd) ;
+    static PFN_protectFromVpn protectFromVpn = NULL;
+    if (protectFromVpn == NULL) {
+        struct fake_dl_ctx *handle = fake_dlopen(SYSTEM_LIB_PATH LIB_NETD_CLIENT_SO, RTLD_NOW);
+        if (!handle) {
+            assert(!"cannot load " LIB_NETD_CLIENT_SO);
+            return -1;
+        }
+        protectFromVpn = (PFN_protectFromVpn) fake_dlsym(handle, "protectFromVpn");
+        fake_dlclose(handle);
+        if (!protectFromVpn) {
+            assert(!"required function protectFromVpn missing in " LIB_NETD_CLIENT_SO);
+            return -1;
+        }
+        LOGI("%s", "==== protectFromVpn catched from " LIB_NETD_CLIENT_SO "! ====\n");
+    }
+    return protectFromVpn(fd);
+}
+
+#endif
 
 extern char *stat_path;
 

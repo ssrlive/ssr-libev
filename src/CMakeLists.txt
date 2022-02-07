@@ -97,6 +97,12 @@ if (WIN32)
 endif ()
 
 if (ANDROID)
+    include(FetchContent)
+    FetchContent_Declare(fake-dlfcn
+            GIT_REPOSITORY https://github.com/ssrlive/fake-dlfcn.git
+            )
+    FetchContent_MakeAvailable(fake-dlfcn)
+
     add_definitions(-DHAVE_CONFIG_H -DUSE_CRYPTO_MBEDTLS -DCONNECT_IN_PROGRESS=EINPROGRESS -DHAVE_PCRE_H)
     include_directories(${LIB_ANCILLARY_DIR})
     add_executable(ssr-client ${SOURCE_FILES_LOCAL})
@@ -106,7 +112,9 @@ if (ANDROID)
             m log
             ev libcork libipset udns sodium
             ancillary ${LIBCRYPTO} ${PCRE_LIBRARIES}
+            fake-dlfcn
             )
+	target_include_directories(ssr-client PRIVATE ${LIB_FAKE_DLFCN_DIR})
 else()
 
 add_executable(ssr-client ${SOURCE_FILES_LOCAL})
