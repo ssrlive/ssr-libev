@@ -101,7 +101,7 @@ protect_socket(int fd)
 #else
 
 #include <dlfcn.h>
-#include <fake_dlfcn.h>
+#include <fake-dlfcn.h>
 #include <assert.h>
 
 int protect_socket(int fd) {
