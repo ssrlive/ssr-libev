@@ -142,7 +142,7 @@ static struct cork_dllist all_connections;
 
 bool run_loop_exit_flag = false;
 ev_timer exit_watch_timer = { 0 };
-int exit_watch_interval = 0.2;
+int exit_watch_interval = 1;
 int g_listenfd = 0;
 
 static void _do_exit_loop_internal(EV_P) {

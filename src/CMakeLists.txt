@@ -105,7 +105,11 @@ if (ANDROID)
 
     add_definitions(-DHAVE_CONFIG_H -DUSE_CRYPTO_MBEDTLS -DCONNECT_IN_PROGRESS=EINPROGRESS -DHAVE_PCRE_H)
     include_directories(${LIB_ANCILLARY_DIR})
+    if (BUILD_SSR_CLIENT_AS_EXE)
     add_executable(ssr-client ${SOURCE_FILES_LOCAL})
+    else()
+    add_library(ssr-client SHARED ${SOURCE_FILES_LOCAL})
+    endif(BUILD_SSR_CLIENT_AS_EXE)
     set_target_properties(ssr-client PROPERTIES COMPILE_DEFINITIONS MODULE_LOCAL)
     set_target_properties(ssr-client PROPERTIES PREFIX "lib" SUFFIX ".so")
     target_link_libraries(ssr-client
