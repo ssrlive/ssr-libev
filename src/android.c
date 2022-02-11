@@ -186,6 +186,7 @@ Java_com_github_shadowsocks_bg_SsrClientWrapper_runSsrClient(JNIEnv *env, jclass
     if (alCls) {
         (*env)->DeleteLocalRef(env, alCls);
     }
+    (void)clazz;
     return result;
 }
 
@@ -193,6 +194,8 @@ JNIEXPORT jint JNICALL
 Java_com_github_shadowsocks_bg_SsrClientWrapper_stopSsrClient(JNIEnv *env, jclass clazz) {
     exit_main_event_loop();
     ev_sleep(1.3);
+    (void)env;
+    (void)clazz;
     return 0;
 }
 
