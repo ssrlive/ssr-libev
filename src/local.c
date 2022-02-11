@@ -98,7 +98,7 @@ int vpn        = 0;
 uint64_t tx    = 0;
 uint64_t rx    = 0;
 ev_tstamp last = 0;
-char *stat_path = NULL;
+void set_traffic_status_file_path(const char *path);
 #endif
 
 #include "includeobfs.h" // I don't want to modify makefile
@@ -1656,7 +1656,7 @@ main(int argc, char **argv)
                 vpn = 1;
                 break;
             case 'S':
-                stat_path = optarg;
+                set_traffic_status_file_path(optarg);
                 break;
 #endif
             case '?':
